@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Login</title>
+<%actInclude("wcb_common.html")%>
+<link href="css/login_20121119.css" rel="stylesheet" type="text/css" />
+</head>
+<script language="javascript">
+
+var login_username, login_password;
+var login_btn;
+var login_form;
+var lang_select;
+var refresh_times = 1;
+var tContent = new Array(); 
+var aContent = new Array();
+
+document.onkeydown = function(e){
+
+	var keycode;
+	
+	if(navigator.appName == "Microsoft Internet Explorer")
+	{
+		keycode = event.keyCode;
+	}
+	else
+	{
+		keycode = e.which;
+	}
+
+	switch (keycode)
+	{
+		case 13: 	// Enter
+			loginCheck();
+			break;
+		default:
+			break;
+	}
+}
+
+function doLoad() 
+{
+	init_language();
+	login_username = document.getElementById("login_username");
+	login_password = document.getElementById("login_password");
+	login_btn = document.getElementById("login_btn");
+	login_form = document.getElementById("login_form");
+	lang_select = document.getElementById("lang_select");
+	lang_select.value = langstat;
+
+	lang_select.onchange = changeLang;
+	login_btn.onclick = loginCheck;
+	login_username.focus();
+}
+
+function pop_up_errors()
+{
+	var urlArray = (window.location.href).split("?");
+	if(urlArray[1] == "k=1")
+	{
+		pop_up(aContent[2]);	
+		login_username.focus();	
+		return;
+	}
+	else if(urlArray[1] == "k=3")
+	{
+		pop_up(aContent[3]);	
+		login_username.focus();	
+		return;
+	}
+	else if(urlArray[1] == "k=5")
+	{
+		pop_up(aContent[4]);	
+		login_username.focus();	
+		return;
+	}
+	/*
+	else if(urlArray[1] == "c=1")
+	{
+		login_username.disabled = true;
+		login_password.disabled = true;
+		login_btn.disabled = true;
+		
+		doRefresh();
+	}
+	*/
+}
+
+function changeLang()
+{
+	document.getElementById("hidden_command").value = "changeLang";
+	login_form.submit();
+}
+
+function init_language()
+{
+	if(cur_lang=="1")
+		var surl = "xml/wcb_home_en.xml";
+	else
+		var surl = "xml/wcb_home_fr.xml";
+	StartGetMULLanageXML(surl);
+}
+
+function DrawHtml(atemp,ttemp)
+{
+	 tContent = ttemp;
+	 aContent = atemp;
+	document.getElementById("title_login_span").innerHTML = tContent[0]; 
+	document.getElementById("login_username_span").innerHTML = tContent[1]; 
+	document.getElementById("login_password_span").innerHTML = tContent[2]; 
+	document.getElementById("login_button_span").innerHTML = tContent[3]; 
+	document.getElementById("forgot_pass_span").innerHTML = tContent[4]; 
+	document.getElementById("lang_select_span").innerHTML = tContent[5]; 
+	document.getElementById("lang_select").options[0].innerHTML = tContent[6];
+	document.getElementById("lang_select").options[1].innerHTML = tContent[7];
+	document.getElementById("lang_select").options[2].innerHTML = tContent[8];
+	pop_up_errors();
+}
+
+function resGetValue(message)
+{
+	if(message == "1")			
+		refresh_times++;	
+	else if(message == "0")
+		refresh_times = 1;
+
+	if(refresh_times >= 6)
+	{
+		login_username.disabled = false;
+		login_password.disabled = false;
+		login_btn.disabled = false;
+	
+		login_username.focus();			
+		window.clearTimeout("doRefresh()");
+		goThere("wcb_home.html");
+	}
+	else
+		window.setTimeout("doRefresh()", 3000);	
+}
+
+function doRefresh()
+{
+	ajaxPost("logincheck.cgi", "&t=1", resGetValue);
+}
+
+function loginCheck()
+{
+	if(login_username.value == "")
+	{
+		pop_up(aContent[0]);
+		login_username.focus();
+		return;
+	}
+
+	if(login_password.value == "")
+	{
+		pop_up(aContent[1]);
+		login_password.focus();
+		return;
+	}
+
+	document.getElementById("hidden_command").value = "apply";
+	login_form.submit();
+}
+
+</script>
+
+
+<body>
+<script  language="Javascript">
+	var top_langstat =  "<% getIndex("telus_langstat"); %>";
+	var top_cur_lang = "";
+	if(top_langstat==""||top_langstat=="NULL")
+		top_langstat = "0";
+	if(top_langstat=="0")
+		{
+			 var Browser_Agent=window.navigator.userAgent;
+			 if(Browser_Agent.indexOf("MSIE")!=-1){
+			 	if(window.navigator.browserLanguage.indexOf("fr")!=-1)
+					top_cur_lang = "2";
+				else
+					top_cur_lang = "1";
+			 }
+			 else{//firefox opera safari
+			 	if(window.navigator.language.indexOf("fr")!=-1)
+					top_cur_lang = "2";
+				else
+					top_cur_lang = "1";
+			 }
+		}
+	else
+		top_cur_lang = top_langstat;
+</script>
+<div id="wrapper">
+<div id="logo_home">
+	<a href="http://www.telus.com">
+	<script language="Javascript">
+		if(top_cur_lang=="2")
+			document.write('<img src="images/fr_logo.png" />');
+		else
+			document.write('<img src="images/logo.jpg" />');
+	</script>		
+	</a>
+</div>
+    <div id="login_div">
+		<div id="login_content_div">
+			<table border=0 cellSpacing=0 cellPadding=0 width="100%">
+				<tr height="40">
+					<td align="center"><strong><span class=PAGE_HEADER id="title_login_span"></span></strong></td>
+				</tr>
+				<tr>
+					<td align="center"><noscript><span  style="color:red;"><strong>Your browser does not support JavaScript!</strong></span></noscript></td>
+				</tr>
+				<tr height="30" id="tr_error" style="display:none;">
+					<td align="center" valign="middle"><font color="red"><span id="span_error_msg"></span></font></td>
+				</tr>
+			</table>
+			<BR>
+
+			<form method="post" name="login_form" id="login_form" action="userlogin.cgi">
+			<input type="hidden" name="top_chanpass_li" id="top_chanpass_li" value="" />
+				<input type="hidden" name="command" id="hidden_command" value="apply" />
+		 	   <input type="hidden" name="mypage" value="/wcb_home.html" />
+				<table border=0 cellSpacing=0 cellPadding=4 width="100%">
+					<tr class=ODD>
+						<td class=GRID_3D_NO_RIGHT width="50%"><strong><span id="login_username_span"></span></strong>:</td>
+						<td class=GRID_3D_NO_LEFT width="50%">
+							<INPUT style="WIDTH: 150px" maxLength=64 id="login_username" name="login_username" value=""/>
+						</td>
+					</tr>
+					<tr class=EVEN>
+						<td class=GRID_3D_NO_RIGHT width="50%"><strong><span id="login_password_span"></span></strong>:</td>
+						<td class=GRID_3D_NO_LEFT width="50%">
+							<INPUT style="WIDTH: 150px;" maxLength=64 type=password id="login_password" name="login_password" value=""/>
+						</td>
+					</tr>
+				</table>
+					
+				<BR>
+				<table border=0 cellSpacing=0 cellPadding=0 width="100%">
+					<tr>
+					<td width="50%"><span id="lang_select_span">language</span>:
+						<select id="lang_select" name="lang_select">
+							<option value="0"></option>
+							<option value="1"></option>
+							<option value="2"></option>
+						</select>
+					</td>												
+						<td width="50%">
+							<table>
+								<tr>
+									<td><a href="###" class="button" id="login_btn"><span id="login_button_span">Login</span></a></td>									
+									<td>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="###" style="color:red;text-decoration:underline;"  onClick="return goThere('forgot_password.html');"><span id="forgot_pass_span"></span>?</a>
+									</td>
+								</tr>
+							</table>
+						</td>								
+					</tr>
+				</table>
+			</form>
+		</div>
+	</div>
+</div>
+</body>
+</html>
+

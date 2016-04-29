@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Advanced Setup - Factory Default</title>
+<%actInclude("wcb_common.html")%>
+
+<script language="javascript">
+
+var restore_btn;
+var default_form;
+var aContent = new Array();
+var tContent = new Array();
+
+function doLoad()
+{
+	restore_btn = document.getElementById("restore_btn");
+	default_form = document.getElementById("default_form");
+
+	restore_btn.onclick = doRestore;
+	init_language();
+}
+
+function init_language()
+{
+	if(cur_lang=="1")
+		var surl = "xml/adv_default_en.xml";
+	else
+		var surl = "xml/adv_default_fr.xml";
+	StartGetMULLanageXML(surl);
+}
+
+function DrawHtml(atemp,ttemp)
+{
+	 tContent = ttemp;
+	 aContent = atemp;
+
+
+	document.getElementById("adv_default_title").innerHTML = tContent[0]; 
+	document.getElementById("adv_def_setting").innerHTML = tContent[1]; 
+	document.getElementById("restore_btn_span").innerHTML = tContent[2];
+	if(cur_lang=="1")
+	{
+		get_top_bottom_en();
+		adv_get_Left_en();
+	}
+	else
+	{
+		get_top_bottom_fr();
+		adv_get_Left_fr();
+	}
+	
+}
+function doRestore()
+{
+	pop_up(aContent[0], 1, formSubmit);	
+}
+
+function formSubmit()
+{
+	default_form.submit();
+}
+
+</script>
+</head>
+
+<body>
+	<div id="wrapper">    
+		<%actInclude("top_nav.html")%>    
+		<%actInclude("left_adv.html")%>
+		
+		<div id="content_right">
+		    <div id="content_right_header"></div>
+		    <div id="content_right_contentarea">
+	        	<h1><span id="adv_default_title" style="font-weight:bold;font-size:16px;">Factory Default</span></h1>
+
+				<form id="default_form" method="post" action="advdefault.cgi">      
+		        <input type="hidden" name="command" value="apply" />
+				<input type="hidden" name="mypage" value="/adv_default.html" />		      
+
+		        <br>
+				<table cellpadding="0" cellspacing="2" border="0">
+		        	<tr>
+		            	<td width="250">
+			      	  		<strong><span id="adv_def_setting"  style="font-weight:bold;font-size:12px;">Factory default setting</span>:</strong>
+		              	</td>
+						<td>
+							<div><a class="button" href="###" id="restore_btn"><span id="restore_btn_span">Restore Default Settings</span></a></div>
+						</td>		    
+		            </tr>
+		        </table>
+		        </form>
+
+				<br><br><br>
+	        	<div class="clear_left"></div>
+	        </div>
+	        <div id="content_right_footer"></div>
+		</div>
+        <div class="clear_left"></div>
+   		<%actInclude("wcb_footer.html")%>
+	</div>
+</body>
+</html>

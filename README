@@ -1,0 +1,63 @@
+HOW TO BUILD A FIRMWARE FOR THE ACTIONTEC TELUS WCB3000N
+
+* How to install the WCB3000N source code onto the Linux workstation
+* How to build the image file that can be loaded on to a WCB3000N
+
+NOTE: The following procedures are known to work with recent version of 
+Ubuntu 12.04 LTS Desktop.  
+
+The WCB3000N Source Code can be obtained from the Actiontec 
+support website at http://opensource.actiontec.com.
+
+1.(Install clean OS Ubuntu 12.04 LTS Desktop.)
+
+2.(Download source code.)
+
+ WECB-TELUS-GPL-0.16.2.5.tgz
+  
+3.(Copy or Move the source code to your working directory.)
+
+$ cp WECB-TELUS-GPL-0.16.2.5.tgz  /<working directory>
+
+4.(Install required packages. Please make sure you have installed necessary lib for compile the project)
+
+$ sudo apt-get -y install gcc g++ m4 binutils patch bzip2 flex bison make autoconf gettext texinfo unzip sharutils subversion build-essential libncurses5-dev ncurses-term zlib1g-dev
+$ sudo apt-get -y install linux-headers-`uname -r` libnewt-dev curl sox libssl-dev
+$ sudo apt-get -y install gawk flex gettext mtd-utils util-linux
+
+5.(Change to the WECB-TELUS-GPL directory)
+
+$ cd <working directory>/
+
+6.(Extract the GPL source code and toolchain to your working directory. Make sure your
+   working directory path does not contain spaces.)
+
+$ tar xvfz WECB-TELUS-GPL-0.16.2.5.tgz 
+
+IMPORTANT: Extracting the source code creates the directory "WECB-TELUS-GPL-0.16.2.5" 
+
+7.(Change to the WECB-TELUS-GPL directory)
+
+$ cd <working directory>/WECB-TELUS-GPL-0.16.2.5/rtl819x
+
+8.(Build the image)
+
+$./do_act_build TELUS WCB3000
+
+Notes: If some syntax errors occured (Maybe in Ubuntu system), make sure that your /bin/sh is linked to the bash not the dash. To correct this run the following commands.
+
+$ sudo rm /bin/sh
+$ sudo ln -s /bin/bash /bin/sh
+
+8.(Binary will be under. <working directory>/WECB-TELUS-GPL-0.16.2.5/rtl819x/image/TELUS-WCB3000-?verion?-act.bin)
+
+
+PLEASE NOTE: The machine-readable software source code provided here is for 
+programmers who may wish to alter or customize the code, and typically will 
+not be of use to the vast majority of consumers. The software source code 
+provided here is subject to Version 2 of the GPL or other GPL or LGPL licenses 
+which are all included in the download and are available below and also at 
+"http://www.gnu.org/licenses/" and as such, the software source code is 
+distributed WITHOUT ANY WARRANTY and subject to the copyrights of the authors. 
+Compiling errors due to lack of public libraries/tools in the customer's 
+specific platform/OS are the responsibility of the user of this GPL source code.

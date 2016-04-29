@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Advanced Setup - Management</title>
+<%actInclude("wcb_common.html")%>
+
+<script language="javascript">
+
+var manage_from;
+var id_command;
+var id_ip, id_subnet, id_gateway;
+var reboot_btn, apply_btn;
+var autoconfig, id_autoconfig;
+var aContent = new Array();
+var tContent = new Array();
+
+function doLoad()
+{
+	manage_from = document.getElementById("manage_from");
+	id_command = document.getElementById("id_command");
+
+	id_ip = document.getElementById("id_ip");
+	id_subnet = document.getElementById("id_subnet");
+    id_gateway = document.getElementById("id_gateway");
+	id_autoconfig = document.getElementById("id_autoconfig");
+	autoconfig = document.getElementById("autoconfig");
+	
+	reboot_btn = document.getElementById("reboot_mng_btn");
+	apply_btn = document.getElementById("diy_apply_btn");
+
+	reboot_btn.onclick = doReboot;
+	apply_btn.onclick = doApply; 
+	
+	init_language();
+
+	doGetIP();
+}
+
+function init_language()
+{
+	if(cur_lang=="1")
+		var surl = "xml/adv_manage_en.xml";
+	else
+		var surl = "xml/adv_manage_fr.xml";
+	StartGetMULLanageXML(surl);
+}
+
+function DrawHtml(atemp,ttemp)
+{
+	 tContent = ttemp;
+	 aContent = atemp;
+
+
+	document.getElementById("mng_title").innerHTML = tContent[0]; 
+	document.getElementById("mng_ip_addr").innerHTML = tContent[1]; 
+	document.getElementById("mng_sub_mask").innerHTML = tContent[2]; 
+	document.getElementById("mng_def_gate").innerHTML = tContent[3]; 
+	document.getElementById("mng_at_conf").innerHTML = tContent[4]; 
+	document.getElementById("mng_reboot").innerHTML = tContent[5]; 
+	document.getElementById("apply_btn_span").innerHTML = tContent[6];
+	document.getElementById("reboot_btn_span").innerHTML = tContent[5];
+	if(cur_lang=="1")
+	{
+		get_top_bottom_en();
+		adv_get_Left_en();
+	}
+	else
+	{
+		get_top_bottom_fr();
+		adv_get_Left_fr();
+	}
+	
+}
+
+function doGetIP()
+{
+	var params = "&command=getvalue";		
+	ajaxPost("advmanage.cgi", params, resGetValue);
+}
+
+function resGetValue(message)
+{
+	var messageArray = message.split("||");
+	
+	if(messageArray.length > 1)
+	{			
+		for(var i = 0; i < messageArray.length - 1; i++)
+		{
+			var index = 0;
+			var advArray = messageArray[i].split("|");
+			var ip = changeString(advArray[index++]);
+			var subnet = changeString(advArray[index++]);
+			var gateway = changeString(advArray[index++]);
+			var autoconfig_value = advArray[index++];
+
+			id_ip.value = ip;
+		    id_subnet.value = subnet;
+		    id_gateway.value = gateway;
+
+			if(autoconfig_value == "1")
+				id_autoconfig.checked = true;
+			else if(autoconfig_value == "0")
+				id_autoconfig.checked = false;
+		}
+	}
+}
+
+function doReboot()
+{
+	pop_up(aContent[0], 1, formSubmit);
+}
+
+function formSubmit()
+{
+	id_command.value = "reboot";
+    manage_from.submit();
+}
+
+function doApply()
+{
+	if(trim(id_ip.value) == "")
+	{
+		pop_up(aContent[1]);
+		id_ip.focus();
+		return;
+	}
+	else if(!isValidIpAddress(id_ip.value))
+	{
+		pop_up(aContent[2]);
+		id_ip.focus();
+		return;
+	}
+
+	if(trim(id_subnet.value) == "")
+	{
+		pop_up(aContent[3]);
+		id_subnet.focus();
+		return;
+	}
+	else if(!isValidSubnetMask(id_subnet.value))
+	{
+		pop_up(aContent[4]);
+		id_subnet.focus();
+		return;
+	}
+
+	if((id_gateway.value!="")&&(id_gateway.value!="0.0.0.0"))
+	{
+		 if(!checkGwIP(id_gateway.value))
+		{		
+			id_gateway.focus();
+			return;
+		}
+	}
+	
+	if(id_autoconfig.checked)
+		autoconfig.value = "1";
+	else
+		autoconfig.value = "0";
+	
+    id_command.value = "apply";
+    manage_from.submit();
+}
+
+</script>
+</head>
+
+<body>
+	<div id="wrapper">    
+		<%actInclude("top_nav.html")%>    
+		<%actInclude("left_adv.html")%>
+		
+		<div id="content_right">
+		    <div id="content_right_header"></div>
+		    <div id="content_right_contentarea">
+	        	<h1><span id="mng_title" style='font-weight:bold;font-size:16px;'>Management</span></h1>
+
+	        	<form id="manage_from" method="post" action="advmanage.cgi">
+		        <input type="hidden" name="command" id="id_command" value="apply" />
+				<input type="hidden" name="mypage" value="/adv_manage.html" />
+				<input type="hidden" name="autoconfig" id="autoconfig" />
+		       
+				<table cellpadding="0" cellspacing="2" border="0">
+					<tr>
+						<td width="250"><label for="id_ip"><span id="mng_ip_addr">Bridge Configuration IP Address</span>:</label></td>
+						<td>
+							<input name="ip" id="id_ip" type="text" size="25" maxlength="32" style="height: 16px"/> 
+						</td>
+					</tr>
+					<tr>
+						<td><label for="id_subnet"><span id="mng_sub_mask">Subnet Mask</span>:</label></td>
+						<td>
+							<input name="subnet" id="id_subnet" type="text" size="25" maxlength="32" style="height: 16px"/> 
+						</td>
+					</tr>
+					<tr>
+						<td><label for="id_gateway"><span id="mng_def_gate">Default Gateway</span>:</label></td>
+						<td>
+							<input name="gateway" id="id_gateway" type="text" size="25" maxlength="32" style="height: 16px"/> 
+						</td>
+					</tr>
+					
+					<tr>
+						<td><label for="id_autoconfig"><span id="mng_at_conf">Auto Configure</span>:</label></td>
+						<td>
+							<input id="id_autoconfig" type="checkbox" /> 
+						</td>
+					</tr>
+					
+					<tr>
+						<td><span id="mng_reboot">Reboot</span>:</td>
+						<td>
+							<div><a class="button" href="###" id="reboot_mng_btn"><span id="reboot_btn_span">Reboot</span></a></div>
+						</td>
+					</tr>
+				</table>
+				</form>
+
+				<table cellpadding="0" cellspacing="2" border="0">
+					<tr>
+						<td width="220">&nbsp;</td>
+						<td>
+							<div><a class="button" href="###" id="diy_apply_btn"><span id="apply_btn_span">Apply</span></a></div>
+						</td>
+					</tr>
+				</table>
+				
+	        	<div class="clear_left"></div>
+	        </div>
+	        <div id="content_right_footer"></div>
+		</div>
+        <div class="clear_left"></div>
+   		<%actInclude("wcb_footer.html")%>
+	</div>
+</body>
+</html>

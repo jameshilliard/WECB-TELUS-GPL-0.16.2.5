@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Advanced Setup - Management</title>
+<%actInclude("wcb_common.html")%>
+
+<script language="javascript">
+
+var ssh_form;
+var glb_ssh_username,glb_ssh_password,glb_ssh_port;
+var glb_id_command;
+var glb_ssh_enable,glb_ssh_disable,glb_ssh_timeout;
+var reboot_btn, apply_btn;
+var aContent = new Array();
+var tContent = new Array();
+
+var sshparams = "<% getInfo("localsshparams"); %>";
+
+function doLoad()
+{
+	ssh_form = document.getElementById("ssh_form");
+	glb_id_command = document.getElementById("id_command");
+
+	glb_ssh_username = document.getElementById("advanced_ssh_username");
+	glb_ssh_password = document.getElementById("advanced_ssh_password");
+	glb_ssh_port = document.getElementById("advanced_ssh_port");
+	glb_ssh_enable = document.getElementById("advanced_ssh_enable");
+	glb_ssh_disable = document.getElementById("advanced_ssh_disable");
+	glb_ssh_timeout = document.getElementById("sel_ssh_timeout");
+	  
+	apply_btn = document.getElementById("diy_apply_btn");
+	apply_btn.onclick = doApply;
+	glb_ssh_enable.onclick = enableSsh;
+	glb_ssh_disable.onclick = disableSsh;
+	glb_ssh_timeout.onchange = changeTimeout;
+
+	doGetSshInfo();
+	init_language();
+}
+
+function init_language()
+{
+	if(cur_lang=="1")
+		var surl = "xml/adv_localssh_en.xml";
+	else
+		var surl = "xml/adv_localssh_fr.xml";
+	StartGetMULLanageXML(surl);
+}
+
+function DrawHtml(atemp,ttemp)
+{
+	 tContent = ttemp;
+	 aContent = atemp;
+
+
+	document.getElementById("ssh_title").innerHTML = tContent[0]; 
+	document.getElementById("sh_local").innerHTML = tContent[0]; 
+	document.getElementById("sh_enable").innerHTML = tContent[1]; 
+	document.getElementById("sh_disable").innerHTML = tContent[2]; 
+	document.getElementById("sh_username").innerHTML = tContent[3]; 
+	document.getElementById("sh_passwd").innerHTML = tContent[4]; 
+	document.getElementById("sh_port").innerHTML = tContent[5]; 
+	document.getElementById("sh_idle").innerHTML = tContent[6];
+	document.getElementById("apply_btn_span").innerHTML = tContent[7];
+	document.getElementById("seconds_span").innerHTML = tContent[8];
+		
+	document.getElementById("sel_ssh_timeout").options[1].text = tContent[9]; 
+	document.getElementById("sel_ssh_timeout").options[2].text = tContent[10];
+	document.getElementById("sel_ssh_timeout").options[3].text = tContent[11];
+	document.getElementById("sel_ssh_timeout").options[4].text = tContent[12];
+	if(cur_lang=="1")
+	{
+		get_top_bottom_en();
+		adv_get_Left_en();
+	}
+	else
+	{
+		get_top_bottom_fr();
+		adv_get_Left_fr();
+	}
+	
+}
+
+function changeTimeout()
+{
+	if(glb_ssh_timeout.value == "custom")
+	{
+		document.getElementById("custom_td").style.display = "block";
+		document.getElementById("custom_ssh_timeout").value = sshparams.split("|")[1];
+	}
+	else
+	{
+		document.getElementById("custom_td").style.display = "none";
+	}	
+}
+
+function enableSsh()
+{
+	glb_ssh_timeout.disabled = false;
+	glb_ssh_username.disabled = false;
+	glb_ssh_password.disabled = false;
+	glb_ssh_port.disabled = false;
+	document.getElementById("custom_ssh_timeout").disabled = false;
+}
+
+function disableSsh()
+{
+	glb_ssh_timeout.disabled = true;
+	glb_ssh_username.disabled = true;
+	glb_ssh_password.disabled = true;
+	glb_ssh_port.disabled = true;
+	document.getElementById("custom_ssh_timeout").disabled = true;
+}
+
+
+function doGetSshInfo()
+{
+	//alert(message);	
+	var index = 0;
+	var advArray = sshparams.split("|");
+	var sshenable = changeString(advArray[index++]);
+	var sshtimeout = changeString(advArray[index++]);
+	var sshusername = changeString(advArray[index++]);
+	var sshpassword = changeString(advArray[index++]);
+	var sshport = changeString(advArray[index++]);
+
+	glb_ssh_username.value = sshusername;
+	glb_ssh_password.value = "actiontecclare";
+	glb_ssh_port.value = sshport;
+
+	if((sshtimeout!="1800")&&(sshtimeout!="43200")&&(sshtimeout!="86400")&&(sshtimeout!="604800"))
+	{
+		glb_ssh_timeout.value = "custom";
+		document.getElementById("custom_td").style.display = "block";
+		document.getElementById("custom_ssh_timeout").value = sshparams.split("|")[1];	
+	}
+	else
+	{
+		document.getElementById("custom_td").style.display = "none";
+		glb_ssh_timeout.value = sshtimeout;
+	}
+
+	if(sshenable==1)
+	{
+		glb_ssh_enable.checked = true;
+		enableSsh();
+	}
+	else
+	{
+		glb_ssh_disable.checked = true;
+		disableSsh();
+	}
+				
+}
+
+function isInUse(port)
+{
+	if( (port == "80") || (port=="4567") || (port=="7547")) {
+		return true;
+	}
+
+}
+function doApply()
+{	
+
+	if(glb_ssh_username.value.indexOf("|")>=0||glb_ssh_username.value.indexOf(" ")>=0||glb_ssh_username.value=="")
+	{
+		pop_up(aContent[0]);
+		return;
+	}
+	if(glb_ssh_password.value.indexOf("|")>=0||glb_ssh_password.value.indexOf(" ")>=0||glb_ssh_password.value=="")
+	{
+		pop_up(aContent[1]);
+		return;
+	}
+
+	if(isNaN(glb_ssh_port.value)||parseInt(glb_ssh_port.value)>65535||parseInt(glb_ssh_port.value)<1)
+	{
+		pop_up(aContent[2]);
+		return;
+	}
+	if( isInUse(glb_ssh_port.value) ) {
+		pop_up(aContent[3]);
+		return;
+	}
+
+
+	if(glb_ssh_timeout.value == "custom")
+	{
+		var custom_time_value = document.getElementById("custom_ssh_timeout").value;
+		if(custom_time_value==""||!isNumber(trim(custom_time_value)))
+		{
+			pop_up(aContent[4]);
+			return;
+		}
+		else	
+			document.getElementById("advanced_ssh_timeout").value =custom_time_value;
+	}
+	else
+			document.getElementById("advanced_ssh_timeout").value =glb_ssh_timeout.value;
+
+
+	if(glb_ssh_password.value=="actiontecclare")
+	{
+		glb_ssh_password.value = "";
+	}
+	// alert("password="+glb_ssh_password.value+"&&timeout="+document.getElementById("advanced_ssh_timeout").value);
+       glb_id_command.value = "apply";
+       ssh_form.submit();
+}
+
+</script>
+</head>
+
+<body>
+	<div id="wrapper">    
+		<%actInclude("top_nav.html")%>    
+		<%actInclude("left_adv.html")%>
+		
+		<div id="content_right">
+		    <div id="content_right_header"></div>
+		    <div id="content_right_contentarea">
+	        	<h1><span id="ssh_title" style="font-weight:bold;font-size:16px;">Local SSH</span></h1>
+
+	        	<form id="ssh_form" method="post" action="advlocalssh.cgi">
+		        <input type="hidden" name="command" id="id_command" value="apply" />
+				<input type="hidden" name="mypage" value="/adv_localssh.html" />
+				<input type="hidden" name="advanced_ssh_timeout" id="advanced_ssh_timeout" value="" />
+		       
+				<table cellpadding="0" cellspacing="2" border="0">
+
+					<tr>
+						<td width="250">
+							<B><span id="sh_local">Local SSH</span></B>:
+						</td>
+						<td>			
+							<input type="radio" id="advanced_ssh_enable" name="advanced_ssh_enable" value="1" size=30 maxlength=63 checked>
+							<span id="sh_enable">Enable</span>
+							<input type="radio" id="advanced_ssh_disable" name="advanced_ssh_enable" value="0" size=30 maxlength=63>
+							<span id="sh_disable">Disable</span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<B><span id="sh_username">Username</span></B>:
+						</td>
+						<td>
+							<input type="text" id="advanced_ssh_username" name="advanced_ssh_username" value="" size=30 maxlength=63>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<B><span id="sh_passwd">Password</span></B>:
+						</td>
+						<td>
+							<input type=password id="advanced_ssh_password" name="advanced_ssh_password" value="" size=30 maxlength=63>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<B><span id="sh_port">SSH Port</pan></B>:
+						</td>
+						<td>
+							<input type="text" id="advanced_ssh_port" name="advanced_ssh_port" value="" size=30 maxlength=63>
+						</td>
+					</tr>
+				</table>
+
+				<table cellpadding="0" cellspacing="2" border="0">	
+					<tr>
+						<td width="250"><B><span id="sh_idle">Idle Disconnect After</span>:</B></td>
+
+						<td>
+								<select name="sel_ssh_timeout" id="sel_ssh_timeout" >
+										<option value="1800">30 Minutes</option>
+										<option value="43200">12 Hours</option>
+										<option value="86400">1 Day</option>
+										<option value="604800">7 Days</option>
+										<option value="custom">Custom</option>
+						               </select>
+						 </td>
+						 <td id="custom_td">
+									<input type="text" id="custom_ssh_timeout" name="custom_ssh_timeout" value="" size=9 maxlength=9><span id="seconds_span">Seconds</span>
+						</td>
+				      </tr>
+				</table>
+				</form>
+
+				<table cellpadding="0" cellspacing="2" border="0">
+					<tr>
+						<td width="220">&nbsp;</td>
+						<td>
+							<div><a class="button" href="###" id="diy_apply_btn"><span id="apply_btn_span">Apply</span></a></div>
+						</td>
+					</tr>
+				</table>
+				
+	        	<div class="clear_left"></div>
+	        </div>
+	        <div id="content_right_footer"></div>
+		</div>
+        <div class="clear_left"></div>
+   		<%actInclude("wcb_footer.html")%>
+	</div>
+</body>
+</html>
+

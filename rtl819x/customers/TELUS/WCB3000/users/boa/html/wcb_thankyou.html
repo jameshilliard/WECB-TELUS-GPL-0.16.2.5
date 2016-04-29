@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Thank You!</title>
+<%actInclude("wcb_common.html")%>
+
+<script language="JavaScript">
+var aContent = new Array();
+var tContent = new Array();
+
+function doLoad()
+{
+	init_language();
+    setTimeout("do_retry()", 3000);
+}
+
+function do_replace()
+{
+    location.href= "<%getInfo("currentPage")%>";
+    setTimeout("do_retry()", 3000);
+}
+
+function do_retry()
+{
+    do_replace();
+}
+
+function init_language()
+{
+	if(cur_lang=="1")
+		var surl = "xml/wcb_thankyou_en.xml";
+	else
+		var surl = "xml/wcb_thankyou_fr.xml";
+	StartGetMULLanageXML(surl);
+}
+
+function DrawHtml(atemp,ttemp)
+{
+	 tContent = ttemp;
+	 aContent = atemp;
+
+
+	document.getElementById("thank_title").innerHTML = tContent[0]; 
+	document.getElementById("thank1_note").innerHTML = tContent[1]; 
+	document.getElementById("than2_note").innerHTML = tContent[2]; 
+
+	if(cur_lang=="1")
+	{
+		get_top_bottom_en();
+	}
+	else
+	{
+		get_top_bottom_fr();
+	}
+	
+}
+
+
+</script>
+</head>
+<body>
+<div id="wrapper">
+	<%actInclude("top_nav.html")%>
+  	<!-- END SIDE NAV -->
+
+	<div id="content_right">
+		<div id="content_right_header"></div>
+		<div id="content_right_contentarea">
+			<h1 class="thankyou"><span id="thank_title" style="font-weight:bold;font-size:16px;">Thank You!</span> </h1>
+			<form>
+				<p><span id="thank1_note">Please wait while we apply the new settings to your device.</span></p>
+				<p><span id="than2_note">After new settings are applied successfully, we'll take you back to the page where the selection was made.</span> </p>
+			</form>
+		</div>
+		<div id="content_right_footer"></div>
+	</div>
+	<div class="clear_left"></div>
+	<%actInclude("wcb_footer.html")%>
+</div>
+</body>
+</html>

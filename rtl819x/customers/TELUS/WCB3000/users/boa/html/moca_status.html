@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>MoCA Coax Status</title>
+<%actInclude("wcb_common.html")%>
+
+<script language="javascript">
+
+var id_mocachannel, id_mocaprivacy, id_mocapassword;
+var aContent = new Array();
+var tContent = new Array();
+
+function doLoad()
+{
+	id_mocaprivacy = document.getElementById("id_mocaprivacy");
+	id_mocachannel = document.getElementById("id_mocachannel");	
+	id_mocapassword = document.getElementById("id_mocapassword");	
+
+	doGetMoca();
+	init_language();
+}
+
+function init_language()
+{
+	if(cur_lang=="1")
+		var surl = "xml/moca_status_en.xml";
+	else
+		var surl = "xml/moca_status_fr.xml";
+	StartGetMULLanageXML(surl);
+}
+
+function DrawHtml(atemp,ttemp)
+{
+	 tContent = ttemp;
+	 aContent = atemp;
+
+
+	document.getElementById("moca_status_title").innerHTML = tContent[0]; 
+	document.getElementById("stat_note1").innerHTML = tContent[1]; 
+	document.getElementById("status_note2").innerHTML = tContent[2]; 
+	document.getElementById("stat_channel").innerHTML = tContent[3]; 
+	document.getElementById("stat_privacy").innerHTML = tContent[4]; 
+	document.getElementById("stat_passwd").innerHTML = tContent[5]; 
+
+	if(cur_lang=="1")
+	{
+		get_top_bottom_en();
+		moca_get_Left_en();
+	}
+	else
+	{
+		get_top_bottom_fr();
+		moca_get_Left_fr();
+		var stat_list = document.getElementById("stat_list_table");
+		var list_length = stat_list.getElementsByTagName("tr").length;
+		if(list_length>0)
+		{
+		document.getElementById("connection_speed").innerHTML = "Débit de la connexion"; 
+		document.getElementById("status_adapter").innerHTML = "Adaptateur"; 
+		document.getElementById("status_mac").innerHTML = "Adresse MAC"; 
+		document.getElementById("status_ip").innerHTML = "Adresse IP"; 
+		document.getElementById("stat_adapter2").innerHTML = "Adaptateur";
+
+		for(var i=0;i<document.getElementsByName("status_device").length;i++)
+			document.getElementsByName("status_device")[i].innerHTML ="Appareil"; 
+		
+		for(var i=0;i<document.getElementsByName("stat_device2").length;i++)
+			document.getElementsByName("stat_device2")[i].innerHTML = "Appareil"; 
+		
+		}
+	}
+	
+}
+
+
+function doGetMoca()
+{
+	var params = "&command=getvalue";		
+	ajaxPost("mocasetup.cgi", params, resGetValue);
+}
+
+function resGetValue(message)
+{
+	var messageArray = message.split("||");
+	
+	if(messageArray.length > 1)
+	{			
+		for(var i = 0; i < messageArray.length - 1; i++)
+		{
+			var index = 0;
+			var mocaArray = messageArray[i].split("|");
+			var taboofre = changeString(mocaArray[index++]);
+			var controller = changeString(mocaArray[index++]); 
+			var beacon = changeString(mocaArray[index++]); 
+			var channel = changeString(mocaArray[index++]);
+			var privacy = changeString(mocaArray[index++]);
+			var password = changeString(mocaArray[index++]);
+
+			if(privacy == "0") 
+            {         
+                id_mocaprivacy.innerHTML = "Disabled";
+                if(cur_lang == "2")
+                    id_mocaprivacy.innerHTML = "Désactivé";
+            }
+		  	else
+		  	{
+                id_mocaprivacy.innerHTML = "Enabled";
+                 if(cur_lang == "2")
+                    id_mocaprivacy.innerHTML = "Activé";
+		    	id_mocapassword.innerHTML = password;
+		  	}
+
+			if(channel == "0x0000000015554000")
+			{
+			    id_mocachannel.innerHTML = "Automatic";
+                 if(cur_lang == "2")
+                    id_mocachannel.innerHTML = "Automatique";
+			}
+			else if(channel == "0x0000000000004000")
+			{
+				id_mocachannel.innerHTML = "D1(1150 MHz)";
+			}
+			else if(channel == "0x0000000000010000")
+			{
+				id_mocachannel.innerHTML = "D2(1200 MHz)";
+			}
+			else if(channel == "0x0000000000040000")
+			{
+				id_mocachannel.innerHTML = "D3(1250 MHz)";
+			}
+			else if(channel == "0x0000000000100000")
+			{
+				id_mocachannel.innerHTML = "D4(1300 MHz)";
+			}
+			else if(channel == "0x0000000000400000")
+			{
+				id_mocachannel.innerHTML = "D5(1350 MHz)";
+			}
+			else if(channel == "0x0000000001000000")
+			{
+				id_mocachannel.innerHTML = "D6(1400 MHz)";
+			}
+			else if(channel == "0x0000000004000000")
+			{
+				id_mocachannel.innerHTML = "D7(1450 MHz)";
+			}
+			else if(channel == "0x0000000010000000")
+			{
+				id_mocachannel.innerHTML = "D8(1500 MHz)"; 
+			}
+		}
+	}
+}
+		
+</script>
+</head>
+
+<body>
+	<div id="wrapper">    
+		<%actInclude("top_nav.html")%>    
+		<%actInclude("left_moca.html")%>
+		
+		<div id="content_right">
+		    <div id="content_right_header"></div>
+		    <div id="content_right_contentarea">
+	        	<h1><span id="moca_status_title" style='font-weight:bold;font-size:16px;'>MoCA Coax Status</span></h1>
+
+				<p align="left">
+					<span id="stat_note1">NOTE:Only advanced technical users should use this feature, all rates are Mbps.</span>
+					<br>
+					<span id="status_note2">The Devices represent the Network Coordinator</span>
+				</p>
+
+			    <table width="88%" border="0" cellpadding="1" cellspacing="0">			    
+				    <tr bgcolor="#e0e5f1">
+				     <td class="GRID_NO_RIGHT" width="50%"><b><span id="stat_channel">Channel</span></b>:</td>
+				     <td class="GRID_NO_LEFT" width="50%"><span id='id_mocachannel'></span></td>
+				    </tr>
+				    <tr bgcolor="#f1f3f9">
+				     <td class="GRID_NO_RIGHT" width="50%"><b><span id="stat_privacy">Privacy</span></b>:</td>
+				     <td class="GRID_NO_LEFT" width="50%"><span id='id_mocaprivacy'></span></td>
+				    </tr>
+				    <tr bgcolor="#e0e5f1">
+				     <td class="GRID_NO_RIGHT" width="50%"><b><span id="stat_passwd">Password</span></b>:</td>
+				     <td class="GRID_NO_LEFT" width="50%"><span id='id_mocapassword'></span></td>
+				    </tr>			    
+			    </table>
+
+				<br>
+			   <div style="overflow:auto;width:650px">
+			    <table id="stat_list_table"  width="88%" border="0" cellpadding="4" cellspacing="0">
+				
+				   <%actTable("moca", "list")%>
+				
+			    </table>
+			</div>
+			    <br><br>
+	        	<div class="clear_left"></div>
+	        </div>
+	        <div id="content_right_footer"></div>
+		</div>
+        <div class="clear_left"></div>
+   		<%actInclude("wcb_footer.html")%>
+	</div>
+</body>
+</html>

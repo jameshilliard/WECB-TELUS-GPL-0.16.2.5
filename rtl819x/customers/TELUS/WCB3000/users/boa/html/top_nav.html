@@ -1,0 +1,68 @@
+<script  language="Javascript">
+	var top_langstat =  "<% getIndex("telus_langstat"); %>";
+	var top_cur_lang = "";
+	if(top_langstat==""||top_langstat=="NULL")
+		top_langstat = "0";
+	if(top_langstat=="0")
+		{
+			 var Browser_Agent=window.navigator.userAgent;
+			 if(Browser_Agent.indexOf("MSIE")!=-1){
+			 	if(window.navigator.browserLanguage.indexOf("fr")!=-1)
+					top_cur_lang = "2";
+				else
+					top_cur_lang = "1";
+			 }
+			 else{//firefox opera safari
+			 	if(window.navigator.language.indexOf("fr")!=-1)
+					top_cur_lang = "2";
+				else
+					top_cur_lang = "1";
+			 }
+		}
+	else
+		top_cur_lang = top_langstat;
+</script>
+<div id="logo">
+	<a href="http://www.telus.com">
+	<script language="Javascript">
+		if(top_cur_lang=="2")
+			document.write('<img src="images/fr_logo.png" />');
+		else
+			document.write('<img src="images/logo.jpg" />');
+	</script>		
+	</a>
+</div>
+<div id="top_nav">
+
+	<div id="user_div">
+		<ul id="userToolbar" class="on">
+			<li class="first-child"><span id="top_hi_span">Hi</span> <span id="top_username"></span></li>
+			<li><a href="###" onclick="javascript:logout()"><span id="top_logout_span">Logout</span></a></li>
+			<li id="top_chanpass_li"><a href="###" onClick="return goThere('adv_password.html');"><span id="top_chan_span">Change Password</span></a></li>
+		</ul>
+	</div>
+
+	<div id="top_nav_header"></div>
+	<div id="top_nav_content">
+		<ul id="navigation">
+			<script  language="javascript">
+				if(top_cur_lang=="2")
+				{
+					document.write('<li class="fr_Status"><a id="top_status" href="###" onClick="return goThere(\'wcb_main.html\');"></a></li>');
+					document.write('<li class="fr_WirelessSetup" id="top_wireless_li"><a id="top_wireless" href="###" onClick="return goThere(\'wl_network.html\');"></a></li>');
+					document.write('<li class="fr_MocaSetup"><a id="top_moca" href="###" onClick="return goThere(\'moca_setup.html\');"></a></li>');
+					document.write('<li class="fr_AdvancedSetup"><a id="top_advanced" href="###" onClick="return goThere(\'adv_manage.html\');"></a></li>');
+				}
+				else
+				{
+					document.write('<li class="Status"><a id="top_status" href="###" onClick="return goThere(\'wcb_main.html\');"></a></li>');
+					document.write('<li class="WirelessSetup" id="top_wireless_li"><a id="top_wireless" href="###" onClick="return goThere(\'wl_network.html\');"></a></li>');
+					document.write('<li class="MocaSetup"><a id="top_moca" href="###" onClick="return goThere(\'moca_setup.html\');"></a></li>');
+					document.write('<li class="AdvancedSetup"><a id="top_advanced" href="###" onClick="return goThere(\'adv_manage.html\');"></a></li>');
+				}
+			</script>
+		</ul>
+	</div>
+	<div id="top_nav_footer"></div>
+</div>
+

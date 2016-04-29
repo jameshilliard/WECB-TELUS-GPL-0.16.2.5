@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Advanced Setup - Management</title>
+<%actInclude("wcb_common.html")%>
+
+<script language="javascript">
+
+var login_form,lang_select,apply_btn;
+var aContent = new Array();
+var tContent = new Array();
+function doLoad()
+{
+	login_form = document.getElementById("login_form");
+	lang_select = document.getElementById("lang_select");
+	apply_btn = document.getElementById("diy_apply_btn");
+	lang_select.value = langstat;
+	apply_btn.onclick = changeLang;
+	init_language();
+}
+
+function init_language()
+{
+	if(cur_lang=="1")
+		var surl = "xml/adv_language_en.xml";
+	else
+		var surl = "xml/adv_language_fr.xml";
+	StartGetMULLanageXML(surl);
+}
+
+function DrawHtml(atemp,ttemp)
+{
+	 tContent = ttemp;
+	 aContent = atemp;
+
+
+	document.getElementById("language_title").innerHTML = tContent[0]; 
+	document.getElementById("lang_lang").innerHTML = tContent[1]; 
+	document.getElementById("lang_select").options[0].text = tContent[2]; 
+	document.getElementById("lang_select").options[1].text = tContent[3]; 
+	document.getElementById("lang_select").options[2].text = tContent[4]; 	
+	document.getElementById("apply_btn_span").innerHTML = tContent[5]; 
+	if(cur_lang=="1")
+	{
+		get_top_bottom_en();
+		adv_get_Left_en();
+	}
+	else
+	{
+		get_top_bottom_fr();
+		adv_get_Left_fr();
+	}
+	
+}
+
+function changeLang()
+{		
+	login_form.submit();
+}
+
+</script>
+</head>
+
+<body>
+	<div id="wrapper">    
+		<%actInclude("top_nav.html")%>    
+		<%actInclude("left_adv.html")%>
+		
+		<div id="content_right">
+		    <div id="content_right_header"></div>
+		    <div id="content_right_contentarea">
+	        	<h1><span id="language_title" style="font-weight:bold;font-size:16px;">Language Settngs</span></h1>
+
+	        	<form method="post" name="login_form" id="login_form" action="userlogin.cgi">
+		        <input type="hidden" name="command" id="id_command" value="changeLang" />
+				<input type="hidden" name="mypage" value="/adv_language.html" />		       
+				<table cellpadding="0" cellspacing="2" border="0">	
+					<tr>
+						<td width="198"><B><span id="lang_lang">Language</span>:</B></td>
+
+						<td>
+								<select name="lang_select" id="lang_select" >
+										<option value="0">Auto-detect</option>
+										<option value="1">English</option>
+										<option value="2">French</option>
+						               </select>
+						 </td>
+				      </tr>
+				</table>
+				</form>
+
+				<table cellpadding="0" cellspacing="2" border="0">
+					<tr>
+						<td width="200">&nbsp;</td>
+						<td>
+							<div><a class="button" href="###" id="diy_apply_btn"><span id="apply_btn_span">Apply</span></a></div>
+						</td>
+					</tr>
+				</table>
+				
+	        	<div class="clear_left"></div>
+	        </div>
+	        <div id="content_right_footer"></div>
+		</div>
+        <div class="clear_left"></div>
+   		<%actInclude("wcb_footer.html")%>
+	</div>
+</body>
+</html>
+

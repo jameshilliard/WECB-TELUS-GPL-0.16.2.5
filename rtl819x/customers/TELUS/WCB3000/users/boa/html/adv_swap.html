@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Advanced Setup - Factory Default</title>
+<%actInclude("wcb_common.html")%>
+
+<script language="javascript">
+
+var swap_btn;
+var swap_form;
+var aContent = new Array();
+var tContent = new Array();
+
+function doLoad()
+{
+	swap_btn = document.getElementById("swap_btn");
+	swap_form = document.getElementById("swap_form");
+
+	swap_btn.onclick = doRestore;
+	doGetImageVersion();
+	init_language();
+}
+
+function init_language()
+{
+	if(cur_lang=="1")
+		var surl = "xml/adv_swap_en.xml";
+	else
+		var surl = "xml/adv_swap_fr.xml";
+	StartGetMULLanageXML(surl);
+}
+
+function DrawHtml(atemp,ttemp)
+{
+	 tContent = ttemp;
+	 aContent = atemp;
+
+
+	document.getElementById("restore_title").innerHTML = tContent[0]; 
+	document.getElementById("restore_active_vers").innerHTML = tContent[1]; 
+	document.getElementById("rest_back_ver").innerHTML = tContent[2]; 
+	document.getElementById("restr_swap").innerHTML = tContent[3]; 
+	document.getElementById("swap_set_span").innerHTML = tContent[4];
+	if(cur_lang=="1")
+	{
+		get_top_bottom_en();
+		adv_get_Left_en();
+	}
+	else
+	{
+		get_top_bottom_fr();
+		adv_get_Left_fr();
+	}
+	
+}
+
+function doGetImageVersion()
+{
+	var params = "&command=getvalue";		
+	ajaxPost("getimageversion.cgi", params, resGetImageVersion);
+}
+
+function resGetImageVersion(message)
+{	
+	if(message.length > 1)
+	{
+	document.getElementById("active_version").innerHTML = message.split('|')[0];
+	document.getElementById("inactive_version").innerHTML = message.split('|')[1];
+	}
+}
+
+function doRestore()
+{
+	pop_up(aContent[0], 1, formSubmit);	
+}
+
+function formSubmit()
+{
+	swap_form.submit();
+}
+
+</script>
+</head>
+
+<body>
+	<div id="wrapper">    
+		<%actInclude("top_nav.html")%>    
+		<%actInclude("left_adv.html")%>
+		
+		<div id="content_right">
+		    <div id="content_right_header"></div>
+		    <div id="content_right_contentarea">
+	        	<h1><span id="restore_title" style="font-weight:bold;font-size:16px;">Firmware Restore</span></h1>
+
+				<form id="swap_form" method="post" action="advswapimage.cgi">      
+		        <input type="hidden" name="command" value="apply" />
+				<input type="hidden" name="mypage" value="/adv_swap.html" />		      
+
+		        <br>
+				<table cellpadding="0" cellspacing="2" border="0">
+					<tr>
+						<td width="250"><strong><span id="restore_active_vers">Active Firmware Version</span>:</strong></td>
+						<td>
+							<span id="active_version"></span>
+						</td>
+					</tr>
+					<tr>
+						<td width="250"><strong><span id="rest_back_ver">Backup Firmware Version</span>:</strong></td>
+						<td>
+							<span id="inactive_version"></span>
+						</td>
+					</tr>
+		        	<tr>
+		            	<td width="250">
+			      	  		<strong><span id="swap_set_span" style="font-weight:bold;font-size:12px;">Firmware swap setting</span>:</strong>
+		              	</td>
+		              	<td><a href="###" class="button" id="swap_btn"><span id="restr_swap">Swap Firmware</span></a></td>
+		            </tr>
+		        </table>
+		        </form>
+
+				<br><br><br>
+	        	<div class="clear_left"></div>
+	        </div>
+	        <div id="content_right_footer"></div>
+		</div>
+        <div class="clear_left"></div>
+   		<%actInclude("wcb_footer.html")%>
+	</div>
+</body>
+</html>
